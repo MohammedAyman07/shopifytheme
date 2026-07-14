@@ -1,0 +1,74 @@
+<div class="lifestyle-banner">
+  {% if section.settings.image != blank %}
+    {{ section.settings.image | image_url: width: 2800 | image_tag: class: 'lifestyle-banner__bg', loading: 'lazy', alt: section.settings.title }}
+  {% else %}
+    <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-lifestyle-2.png" class="lifestyle-banner__bg" alt="Lifestyle background">
+  {% endif %}
+  
+  <div class="lifestyle-banner__overlay"></div>
+
+  <div class="lifestyle-banner__content reveal">
+    {% if section.settings.eyebrow != blank %}
+      <div class="lifestyle-banner__eyebrow">{{ section.settings.eyebrow }}</div>
+    {% endif %}
+    
+    <h2 class="lifestyle-banner__title">{{ section.settings.title }}</h2>
+    
+    {% if section.settings.text != blank %}
+      <p class="lifestyle-banner__text">{{ section.settings.text }}</p>
+    {% endif %}
+    
+    {% if section.settings.btn_link != blank %}
+      <a href="{{ section.settings.btn_link }}" class="btn btn-gold btn-xl">
+        {{ section.settings.btn_label }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Lifestyle Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Premium Quality"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Elevate Your Everyday Life"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Subheading",
+      "default": "Experience the perfect blend of luxury and functionality with our premium collection."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "Shop Collection"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lifestyle Banner"
+    }
+  ]
+}
+{% endschema %}

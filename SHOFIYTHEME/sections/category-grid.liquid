@@ -1,0 +1,97 @@
+<div class="category-grid section-gap">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">{{ section.settings.eyebrow }}</div>
+      <h2 class="section-title">{{ section.settings.title }}</h2>
+      <p class="section-subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <div class="category-grid__items">
+      {% for block in section.blocks %}
+        {% assign collection = block.settings.collection %}
+        <a href="{% if collection != blank %}{{ collection.url }}{% else %}#{% endif %}" class="category-card reveal reveal-delay-{{ forloop.index | modulo: 5 }}" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            {{ block.settings.image | image_url: width: 600 | image_tag: class: 'category-card__img', loading: 'lazy' }}
+          {% elsif collection.image != blank %}
+            {{ collection.image | image_url: width: 600 | image_tag: class: 'category-card__img', loading: 'lazy' }}
+          {% else %}
+            <div class="category-card__img" style="background: var(--clr-muted-2);"></div>
+          {% endif %}
+          
+          <div class="category-card__overlay"></div>
+          
+          <div class="category-card__content">
+            <span class="category-card__emoji">{{ block.settings.emoji }}</span>
+            <h3 class="category-card__name">{% if collection != blank %}{{ collection.title }}{% else %}Collection{% endif %}</h3>
+            <div class="category-card__count">{% if collection != blank %}{{ collection.all_products_count }} Products{% else %}12 Products{% endif %}</div>
+            <div class="category-card__arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Shop by Category",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Explore"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Find exactly what you're looking for."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image (optional)"
+        },
+        {
+          "type": "text",
+          "id": "emoji",
+          "label": "Emoji Icon",
+          "default": "✨"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Category",
+      "blocks": [
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" },
+        { "type": "collection" }
+      ]
+    }
+  ]
+}
+{% endschema %}

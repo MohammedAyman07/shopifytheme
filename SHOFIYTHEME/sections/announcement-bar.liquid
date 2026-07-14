@@ -1,0 +1,111 @@
+{% if section.settings.show_announcement %}
+  <div class="announcement-bar" role="region" aria-label="Announcement">
+    <div class="announcement-bar__track">
+      {% for block in section.blocks %}
+        <div class="announcement-bar__item" {{ block.shopify_attributes }}>
+          {% if block.settings.icon != 'none' %}
+            <span class="gold">
+              {% case block.settings.icon %}
+                {% when 'truck' %}🚚
+                {% when 'star' %}⭐
+                {% when 'lock' %}🔒
+                {% when 'gift' %}🎁
+              {% endcase %}
+            </span>
+          {% endif %}
+          {{ block.settings.text }}
+        </div>
+      {% endfor %}
+      
+      <!-- Duplicate for marquee effect -->
+      {% for block in section.blocks %}
+        <div class="announcement-bar__item" aria-hidden="true">
+          {% if block.settings.icon != 'none' %}
+            <span class="gold">
+              {% case block.settings.icon %}
+                {% when 'truck' %}🚚
+                {% when 'star' %}⭐
+                {% when 'lock' %}🔒
+                {% when 'gift' %}🎁
+              {% endcase %}
+            </span>
+          {% endif %}
+          {{ block.settings.text }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Announcement Bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "star", "label": "Star" },
+            { "value": "lock", "label": "Lock" },
+            { "value": "gift", "label": "Gift" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Free Worldwide Shipping"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "announcement",
+        "settings": {
+          "icon": "truck",
+          "text": "Free Worldwide Shipping"
+        }
+      },
+      {
+        "type": "announcement",
+        "settings": {
+          "icon": "star",
+          "text": "Thousands of Happy Customers"
+        }
+      },
+      {
+        "type": "announcement",
+        "settings": {
+          "icon": "lock",
+          "text": "Secure Checkout"
+        }
+      },
+      {
+        "type": "announcement",
+        "settings": {
+          "icon": "gift",
+          "text": "Limited Time Offers"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

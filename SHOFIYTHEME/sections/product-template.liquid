@@ -1,0 +1,320 @@
+<div class="product-page">
+  <div class="container">
+    {% render 'breadcrumb' %}
+
+    <div class="product-page-layout">
+      <!-- Media Gallery -->
+      <div class="product-gallery">
+        <div class="product-gallery__main">
+          {% if product.selected_or_first_available_variant.featured_media != null %}
+            {% assign featured_media = product.selected_or_first_available_variant.featured_media %}
+          {% else %}
+            {% assign featured_media = product.featured_media %}
+          {% endif %}
+          
+          <img src="{{ featured_media | image_url: width: 1200 }}" 
+               id="MainProductImage" 
+               alt="{{ featured_media.alt | escape }}" 
+               loading="eager"
+               style="max-width:100%; width:100%; height:100%; object-fit:contain;">
+        </div>
+        
+        {% if product.media.size > 1 %}
+          <div class="product-gallery__thumbs">
+            {% for media in product.media %}
+              <div class="product-gallery__thumb {% if media == featured_media %}active{% endif %}" data-media-id="{{ media.id }}" data-image-url="{{ media | image_url: width: 1200 }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt | escape }}" loading="lazy">
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <h1 class="product-info__title">{{ product.title }}</h1>
+        
+        <!-- Judge.me preview badge (real star rating) -->
+        <div class='jdgm-widget jdgm-preview-badge' data-id='{{ product.id }}'>
+          {{ product.metafields.judgeme.badge }}
+        </div>
+
+        <div class="product-info__price" id="ProductPriceRow">
+          <span class="product-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+          {% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}
+            <span class="product-compare">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+            <span class="product-save">Save {{ product.selected_or_first_available_variant.compare_at_price | minus: product.selected_or_first_available_variant.price | times: 100.0 | divided_by: product.selected_or_first_available_variant.compare_at_price | round }}%</span>
+          {% endif %}
+        </div>
+
+        <!-- Form -->
+        <form method="post" action="/cart/add" id="AddToCartForm" accept-charset="UTF-8" class="product-form" enctype="multipart/form-data">
+          <input type="hidden" name="form_type" value="product">
+          <input type="hidden" name="utf8" value="✓">
+          
+          <!-- Variants -->
+          {% unless product.has_only_default_variant %}
+            {% for option in product.options_with_values %}
+              <div class="product-option">
+                <div class="product-option__label">{{ option.name }}: <span id="SelectedOption-{{ forloop.index0 }}">{{ option.selected_value }}</span></div>
+                
+                {% assign is_color = false %}
+                {% assign name_downcase = option.name | downcase %}
+                {% if name_downcase contains 'color' or name_downcase contains 'colour' %}
+                  {% assign is_color = true %}
+                {% endif %}
+                
+                <div class="{% if is_color %}option-swatches{% else %}option-buttons{% endif %}">
+                  {% for value in option.values %}
+                    <label class="{% if is_color %}option-swatch{% else %}option-btn{% endif %} {% if option.selected_value == value %}active{% endif %}">
+                      <input type="radio" 
+                             name="options[{{ option.name | escape }}]" 
+                             value="{{ value | escape }}"
+                             {% if option.selected_value == value %}checked="checked"{% endif %}
+                             class="visually-hidden variant-selector"
+                             data-index="option{{ forloop.parentloop.index }}">
+                      {% if is_color %}
+                        <span style="background-color: {{ value | handle }}; display: block; width: 100%; height: 100%; border-radius: 50%;"></span>
+                      {% else %}
+                        {{ value }}
+                      {% endif %}
+                    </label>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          {% endunless %}
+
+          <!-- Master Select Hidden -->
+          <select name="id" id="ProductSelect" class="visually-hidden" style="display: none;">
+            {% for variant in product.variants %}
+              <option value="{{ variant.id }}" 
+                      data-price="{{ variant.price | money }}"
+                      data-compare="{{ variant.compare_at_price | money }}"
+                      {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
+                {{ variant.title }}
+              </option>
+            {% endfor %}
+          </select>
+
+          <!-- Delivery -->
+          <div class="product-delivery">
+            <div class="product-delivery__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            </div>
+            <div class="product-delivery__text">
+              <strong>Free Worldwide Shipping</strong>
+              <div style="font-size: 0.85em; color: var(--clr-muted); margin-top: 4px;">
+                Estimated Processing Time: 1-3 days<br>
+                Estimated Delivery Time: 3-5 days
+              </div>
+              <div style="margin-top: 4px;">Arrival: <strong class="product-delivery__date" id="dynamicDeliveryDate">Calculating...</strong></div>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const minDays = 4; // 1 processing + 3 delivery
+              const maxDays = 8; // 3 processing + 5 delivery
+              const today = new Date();
+              
+              const minDate = new Date(today);
+              minDate.setDate(today.getDate() + minDays);
+              
+              const maxDate = new Date(today);
+              maxDate.setDate(today.getDate() + maxDays);
+              
+              const options = { month: 'short', day: 'numeric' };
+              const dateString = minDate.toLocaleDateString('en-US', options) + ' - ' + maxDate.toLocaleDateString('en-US', options);
+              
+              document.getElementById('dynamicDeliveryDate').innerText = dateString;
+            });
+          </script>
+
+          <!-- Quantity & ATC -->
+          <div class="product-atc-row">
+            <div class="qty-selector">
+              <button type="button" class="qty-btn qty-minus">−</button>
+              <input type="number" class="qty-input" name="quantity" value="1" min="1">
+              <button type="button" class="qty-btn qty-plus">+</button>
+            </div>
+            
+            <button type="submit" name="add" class="product-atc-btn" {% unless product.available %}disabled{% endunless %}>
+              {% if product.available %}
+                {% render 'icon-cart' %} Add To Cart
+              {% else %}
+                Sold Out
+              {% endif %}
+            </button>
+          </div>
+          
+          {% if section.settings.show_dynamic_checkout and product.available %}
+            {{ form | payment_button }}
+          {% endif %}
+        </form>
+
+        <div class="product-trust-list">
+          <div class="product-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg> Secure Checkout</div>
+          <div class="product-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> 30-Day Guarantee</div>
+        </div>
+
+        <!-- Accordions -->
+        <div class="product-accordions">
+          {% if product.description != blank %}
+            <div class="accordion-item open">
+              <div class="accordion-header">
+                Product Details
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </div>
+              <div class="accordion-body">
+                <div class="accordion-body-inner">
+                  {{ product.description }}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          
+          <div class="accordion-item">
+            <div class="accordion-header">
+              Shipping & Returns
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <p><strong>Free Worldwide Shipping on all orders.</strong></p>
+                <p>We process all orders within 24-48 hours. Standard delivery times are 5-10 business days depending on your location.</p>
+                <p><strong>30-Day Return Policy:</strong> If you're not completely satisfied with your purchase, you can return it within 30 days for a full refund.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="reviews" class="container section-gap">
+  <div style="border-top: 1px solid #f0ede8; padding-top: 60px;">
+    <!-- Start of Judge.me code -->{% assign has_legacy = false %}{% if product.metafields.judgeme.widget.size > 20 %}{% assign has_legacy = true %}{% endif %}<div style='clear:both'></div><div id='judgeme_product_reviews' class='jdgm-widget jdgm-review-widget' data-product-title='{{ product.title | escape }}' data-id='{{ product.id }}' data-product-id='{{ product.id }}' data-widget='review' data-auto-install='false' data-shop-reviews-count='{{ shop.metafields.judgeme.shop_reviews_count | default: 0 | escape }}' data-entry-point='review_widget.js' data-entry-key='review-widget/main.js'>{% if has_legacy %}<div class='jdgm-legacy-widget-content' style='display: none;'>{{ product.metafields.judgeme.widget }}</div>{% endif %}</div>{% if product.metafields.judgeme.review_widget_data %}<script>jdgm.data ||= {}; jdgm.data.reviewWidget ||= {}; jdgm.data.reviewWidget[{{ product.id }}] = {{ product.metafields.judgeme.review_widget_data }}</script>{% endif %}<!-- End of Judge.me code -->
+  </div>
+</div>
+
+
+<!-- Sticky ATC -->
+<div class="sticky-atc">
+  <div style="width: 48px; height: 48px; border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0;">
+    <img src="{{ product.featured_image | image_url: width: 100 }}" style="width: 100%; height: 100%; object-fit: cover;">
+  </div>
+  <div class="sticky-atc__info">
+    <div class="sticky-atc__title">{{ product.title }}</div>
+    <div class="sticky-atc__price">{{ product.selected_or_first_available_variant.price | money }}</div>
+  </div>
+  <button class="sticky-atc__btn" onclick="document.querySelector('#AddToCartForm').submit();">Add To Cart</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Gallery Thumbnails
+    const mainImg = document.getElementById('MainProductImage');
+    const thumbs = document.querySelectorAll('.product-gallery__thumb');
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        thumbs.forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        mainImg.src = thumb.getAttribute('data-image-url');
+      });
+    });
+
+    // Accordion
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        header.closest('.accordion-item').classList.toggle('open');
+      });
+    });
+
+    // Variant Selection
+    const variants = {{ product.variants | json }};
+    const selectors = document.querySelectorAll('.variant-selector');
+    
+    selectors.forEach(selector => {
+      selector.addEventListener('change', () => {
+        // Update styling
+        const allInGroup = selector.closest('div').querySelectorAll('label');
+        allInGroup.forEach(l => l.classList.remove('active'));
+        selector.closest('label').classList.add('active');
+        
+        // Update selected text
+        const index = selector.getAttribute('data-index').replace('option', '') - 1;
+        document.getElementById(`SelectedOption-${index}`).innerText = selector.value;
+        
+        // Find matching variant
+        const currentOptions = Array.from(document.querySelectorAll('.variant-selector:checked')).map(el => el.value);
+        const matchedVariant = variants.find(v => {
+          return v.options.every((opt, i) => opt === currentOptions[i]);
+        });
+        
+        if (matchedVariant) {
+          document.getElementById('ProductSelect').value = matchedVariant.id;
+          
+          // Update Price
+          const priceStr = (matchedVariant.price / 100).toFixed(2);
+          const formatMoney = (amount) => {
+            try {
+              const currency = (window.theme && window.theme.currency) ? window.theme.currency : 'USD';
+              return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(parseFloat(amount));
+            } catch(e) {
+              return '$' + amount;
+            }
+          };
+          document.querySelector('.product-price').innerHTML = formatMoney(priceStr);
+          const stickyPrice = document.querySelector('.sticky-atc__price');
+          if (stickyPrice) stickyPrice.innerHTML = formatMoney(priceStr);
+          
+          // Update Button
+          const btn = document.querySelector('.product-atc-btn');
+          if (matchedVariant.available) {
+            btn.disabled = false;
+            btn.innerHTML = `{% render 'icon-cart' %} Add To Cart`;
+          } else {
+            btn.disabled = true;
+            btn.innerHTML = `Sold Out`;
+          }
+          
+          // Update Image
+          if (matchedVariant.featured_image) {
+            const mediaId = matchedVariant.featured_media.id;
+            const targetThumb = document.querySelector(`.product-gallery__thumb[data-media-id="${mediaId}"]`);
+            if (targetThumb) targetThumb.click();
+          }
+        }
+      });
+    });
+
+    // Sticky ATC Scroll
+    const stickyAtc = document.querySelector('.sticky-atc');
+    const atcBtn = document.querySelector('.product-atc-btn');
+    if (stickyAtc && atcBtn) {
+      window.addEventListener('scroll', () => {
+        const atcRect = atcBtn.getBoundingClientRect();
+        if (atcRect.bottom < 0) {
+          stickyAtc.classList.add('visible');
+        } else {
+          stickyAtc.classList.remove('visible');
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Template",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout buttons",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

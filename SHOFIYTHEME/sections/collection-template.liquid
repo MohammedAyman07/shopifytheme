@@ -1,0 +1,125 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">{{ collection.title }}</h1>
+    {% if collection.description != blank %}
+      <div class="page-hero__subtitle">{{ collection.description }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container section-gap-sm">
+  {% render 'breadcrumb' %}
+
+  <div class="collection-layout">
+    <div class="collection-sidebar">
+      <form id="CollectionFiltersForm">
+        {%- for filter in collection.filters -%}
+          <div class="filter-group open">
+            <div class="filter-group__header">
+              {{ filter.label }}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="filter-group__body">
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  {%- for value in filter.values -%}
+                    <label class="filter-check">
+                      <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                      {{ value.label | escape }} ({{ value.count }})
+                    </label>
+                  {%- endfor -%}
+                {%- when 'price_range' -%}
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <input name="{{ filter.min_value.param_name }}" type="number" placeholder="0" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" style="width: 100%; padding: 8px; border: 1px solid var(--clr-border); border-radius: var(--radius-sm);">
+                    <span>-</span>
+                    <input name="{{ filter.max_value.param_name }}" type="number" placeholder="{{ filter.range_max | money_without_currency | replace: ',', '' }}" min="0" max="{{ filter.range_max | money_without_currency | replace: ',', '' }}" style="width: 100%; padding: 8px; border: 1px solid var(--clr-border); border-radius: var(--radius-sm);">
+                  </div>
+              {%- endcase -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </form>
+    </div>
+
+    <div class="collection-main">
+      <div class="collection-toolbar">
+        <div class="collection-count">{{ collection.products_count }} products</div>
+        <div class="collection-sort">
+          <select name="sort_by" form="CollectionFiltersForm" id="SortBy">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected="selected"{% endif %}>{{ option.name }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      </div>
+
+      {% paginate collection.products by section.settings.products_per_page %}
+        <div class="product-grid" id="ProductGridContainer">
+          {% for product in collection.products %}
+            {% render 'product-card', product: product %}
+          {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 0;">
+              No products found.
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          <div class="pagination" style="margin-top: 3rem; text-align: center;">
+            {{ paginate | default_pagination }}
+          </div>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Filter toggles
+    document.querySelectorAll('.filter-group__header').forEach(header => {
+      header.addEventListener('click', () => {
+        header.closest('.filter-group').classList.toggle('open');
+      });
+    });
+
+    // Handle filter changes
+    const form = document.getElementById('CollectionFiltersForm');
+    if(form) {
+      form.addEventListener('change', () => {
+        const url = new URL(window.location.href);
+        const searchParams = new URLSearchParams(new FormData(form));
+        url.search = searchParams.toString();
+        
+        fetch(url.toString())
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newGrid = doc.getElementById('ProductGridContainer');
+            if(newGrid) {
+              document.getElementById('ProductGridContainer').innerHTML = newGrid.innerHTML;
+            }
+            window.history.pushState({}, '', url.toString());
+          });
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection Template",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 12,
+      "max": 48,
+      "step": 4,
+      "label": "Products per page",
+      "default": 16
+    }
+  ]
+}
+{% endschema %}

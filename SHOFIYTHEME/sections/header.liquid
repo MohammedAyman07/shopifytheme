@@ -1,0 +1,150 @@
+{%- liquid
+  assign is_transparent = false
+  if template.name == 'index' and section.settings.transparent_on_home
+    assign is_transparent = true
+  endif
+-%}
+
+<header class="site-header {% if is_transparent %}site-header--transparent site-header--dark{% else %}site-header--solid{% endif %}">
+  <div class="header-inner">
+    
+    <!-- Mobile Menu Button -->
+    <button class="hamburger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Logo -->
+    <div class="header-logo">
+      <a href="{{ routes.root_url }}">
+        {% if section.settings.logo != blank %}
+          {{ section.settings.logo | image_url: width: 400 | image_tag: class: 'header-logo__img', alt: section.settings.logo.alt | default: shop.name }}
+        {% else %}
+          <span class="header-logo__text">Daily <span>Scroll</span></span>
+        {% endif %}
+      </a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="header-nav" role="navigation">
+      {% for link in linklists[section.settings.menu].links %}
+        <div class="header-nav__item">
+          <a href="{{ link.url }}" class="header-nav__link {% if link.active %}active{% endif %}">
+            {{ link.title }}
+            {% if link.links != blank %}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 3.5L5 6L7.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {% endif %}
+          </a>
+
+          {% if link.links != blank %}
+            <div class="mega-menu">
+              <div class="mega-menu__grid">
+                {% for childlink in link.links %}
+                  <div class="mega-menu__col">
+                    <div class="mega-menu__col-title">{{ childlink.title }}</div>
+                    {% if childlink.links != blank %}
+                      <div class="mega-menu__links">
+                        {% for grandchildlink in childlink.links %}
+                          <a href="{{ grandchildlink.url }}" class="mega-menu__link">{{ grandchildlink.title }}</a>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </nav>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <!-- Currency/Lang selectors omitted for brevity, would use Shopify form tags -->
+      
+      <button class="header-icon-btn header-search-btn" aria-label="Search">
+        {% render 'icon-search' %}
+      </button>
+
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ routes.account_url }}" class="header-icon-btn" aria-label="Account">
+          {% render 'icon-user' %}
+        </a>
+      {% endif %}
+
+      <button class="header-icon-btn header-cart-btn" aria-label="Cart">
+        {% render 'icon-cart' %}
+        <div class="cart-count {% if cart.item_count > 0 %}visible{% endif %}">{{ cart.item_count }}</div>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-nav">
+  <div class="mobile-nav__overlay"></div>
+  <div class="mobile-nav__drawer">
+    <div class="mobile-nav__header">
+      <div class="header-logo__text" style="font-size: var(--text-xl);">Daily <span>Scroll</span></div>
+      <button class="mobile-nav__close" aria-label="Close menu">&times;</button>
+    </div>
+    <div class="mobile-nav__links">
+      {% for link in linklists[section.settings.menu].links %}
+        {% if link.links != blank %}
+          <div class="mobile-nav__item">
+            <a href="{{ link.url }}" class="mobile-nav__link mobile-nav__link-toggle" aria-controls="MobileSub-{{ forloop.index }}">
+              {{ link.title }}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="transition: transform 0.3s;"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div id="MobileSub-{{ forloop.index }}" class="mobile-nav__sub">
+              {% for childlink in link.links %}
+                <a href="{{ childlink.url }}" class="mobile-nav__sub-link">{{ childlink.title }}</a>
+                {% if childlink.links != blank %}
+                  {% for grandchildlink in childlink.links %}
+                    <a href="{{ grandchildlink.url }}" class="mobile-nav__sub-link" style="padding-left: var(--space-4);">— {{ grandchildlink.title }}</a>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <a href="{{ link.url }}" class="mobile-nav__link">{{ link.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    
+    <div style="margin-top: var(--space-8);">
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ routes.account_url }}" class="btn btn-outline btn-full" style="margin-bottom: var(--space-3);">
+          {% render 'icon-user' %} My Account
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_on_home",
+      "label": "Transparent header on homepage",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

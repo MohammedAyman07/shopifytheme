@@ -1,0 +1,92 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">{{ page.title }}</h1>
+    <div class="page-hero__subtitle">{{ section.settings.subtitle }}</div>
+  </div>
+</div>
+
+<div class="section-gap container">
+  <div class="contact-page">
+    <div class="contact-info reveal reveal-delay-1">
+      <h2 style="font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-6);">Get in touch</h2>
+      <p style="color: var(--clr-muted); margin-bottom: var(--space-8); line-height: 1.7;">We'd love to hear from you. Our friendly team is always here to chat.</p>
+      
+      <div class="contact-info-item">
+        <div class="contact-info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </div>
+        <div>
+          <div class="contact-info-label">Email</div>
+          <div class="contact-info-value">
+            <a href="mailto:{{ section.settings.email }}">{{ section.settings.email }}</a><br>
+            <span style="font-size: var(--text-xs); color: var(--clr-muted-2);">We usually reply within 24 hours.</span>
+          </div>
+        </div>
+      </div>
+      
+
+    </div>
+
+    <div class="contact-form-wrapper reveal reveal-delay-2" style="background: var(--clr-surface); padding: var(--space-8); border-radius: var(--radius-xl);">
+      {% form 'contact', id: 'ContactForm' %}
+        {% if form.posted_successfully? %}
+          <div style="background: rgba(47,133,90,0.1); color: #2f855a; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-weight: 600;">
+            Thanks for reaching out! We'll get back to you as soon as possible.
+          </div>
+        {% elsif form.errors %}
+          <div style="background: #fff0f0; color: #e53e3e; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 2rem; font-weight: 600;">
+            {{ form.errors | default_errors }}
+          </div>
+        {% endif %}
+
+        <div class="grid-2">
+          <div class="contact-form-group">
+            <label for="ContactFormName">First Name</label>
+            <input type="text" id="ContactFormName" name="contact[name]" required>
+          </div>
+          <div class="contact-form-group">
+            <label for="ContactFormLastName">Last Name</label>
+            <input type="text" id="ContactFormLastName" name="contact[last_name]" required>
+          </div>
+        </div>
+
+        <div class="contact-form-group">
+          <label for="ContactFormEmail">Email</label>
+          <input type="email" id="ContactFormEmail" name="contact[email]" required>
+        </div>
+
+        <div class="contact-form-group">
+          <label for="ContactFormOrder">Order Number (optional)</label>
+          <input type="text" id="ContactFormOrder" name="contact[order_number]">
+        </div>
+
+        <div class="contact-form-group">
+          <label for="ContactFormMessage">Message</label>
+          <textarea id="ContactFormMessage" name="contact[body]" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: var(--space-4);">Send Message</button>
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact Template",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "We're here to help."
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email Address",
+      "default": "dailyscrollstore@gmail.com"
+    }
+  ]
+}
+{% endschema %}

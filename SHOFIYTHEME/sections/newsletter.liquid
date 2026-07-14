@@ -1,0 +1,65 @@
+<div class="newsletter-section section-gap-lg">
+  <div class="container">
+    <div class="newsletter-inner reveal">
+      {% if section.settings.offer != blank %}
+        <div class="newsletter-offer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          {{ section.settings.offer }}
+        </div>
+      {% endif %}
+      
+      <h2 class="newsletter-title">{{ section.settings.title }}</h2>
+      <p class="newsletter-subtitle">{{ section.settings.subtitle }}</p>
+      
+      {% form 'customer', class: 'newsletter-form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <input type="email" 
+               name="contact[email]" 
+               class="newsletter-input" 
+               placeholder="Enter your email address" 
+               required
+               aria-label="Email address">
+        <button type="submit" class="btn btn-gold btn-lg">Subscribe</button>
+        
+        {% if form.posted_successfully? %}
+          <div style="color: #48bb78; margin-top: 1rem; width: 100%;">Thanks for subscribing! Check your email for your code.</div>
+        {% elsif form.errors %}
+          <div style="color: #e53e3e; margin-top: 1rem; width: 100%;">{{ form.errors | default_errors }}</div>
+        {% endif %}
+      {% endform %}
+      
+      <div class="newsletter-disclaimer">By subscribing you agree to our Terms of Service and Privacy Policy.</div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    {
+      "type": "text",
+      "id": "offer",
+      "label": "Offer Badge",
+      "default": "Get 10% Off"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Join The Inner Circle"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Subscribe to receive updates, access to exclusive deals, and more."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter Subscription"
+    }
+  ]
+}
+{% endschema %}

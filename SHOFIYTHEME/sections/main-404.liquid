@@ -1,0 +1,15 @@
+<div class="page-hero" style="min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+  <div class="container">
+    <div style="font-size: 6rem; line-height: 1; font-family: var(--font-display); font-weight: 900; margin-bottom: var(--space-4); color: var(--clr-gold);">404</div>
+    <h1 class="page-hero__title">Page Not Found</h1>
+    <p class="page-hero__subtitle" style="margin-bottom: var(--space-8);">The page you are looking for doesn't exist or has been moved.</p>
+    <a href="{{ routes.root_url }}" class="btn btn-primary btn-lg">Back to Homepage</a>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "404 Page",
+  "settings": []
+}
+{% endschema %}

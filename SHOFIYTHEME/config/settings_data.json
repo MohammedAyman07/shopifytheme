@@ -1,0 +1,10 @@
+{
+  "current": {
+    "color_primary": "#000000",
+    "color_gold": "#C9A84C",
+    "color_surface": "#F8F8F6",
+    "cart_show_free_shipping": true,
+    "cart_free_shipping_threshold": 100,
+    "show_trust_badges": true
+  }
+}

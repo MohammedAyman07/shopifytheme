@@ -1,0 +1,12 @@
+<div class="price">
+  {% if product.price_varies %}
+    <span class="price__from">From </span>
+    <span class="price__regular">{{ product.price_min | money }}</span>
+  {% else %}
+    <span class="price__regular {% if product.compare_at_price > product.price %}price__sale{% endif %}">{{ product.price | money }}</span>
+  {% endif %}
+  
+  {% if product.compare_at_price > product.price %}
+    <span class="price__compare">{{ product.compare_at_price | money }}</span>
+  {% endif %}
+</div>

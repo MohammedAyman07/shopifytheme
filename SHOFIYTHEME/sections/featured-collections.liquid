@@ -1,0 +1,136 @@
+<div class="featured-collections section-gap">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">{{ section.settings.eyebrow }}</div>
+      <h2 class="section-title">{{ section.settings.title }}</h2>
+    </div>
+
+    {% if section.blocks.size > 0 %}
+      <div class="tabs reveal">
+        {% for block in section.blocks %}
+          <button class="tab-btn {% if forloop.first %}active{% endif %}" data-target="fc-tab-{{ block.id }}">
+            {{ block.settings.title }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <div class="tabs-content">
+        {% for block in section.blocks %}
+          <div id="fc-tab-{{ block.id }}" class="tab-content {% if forloop.first %}active{% endif %}" {{ block.shopify_attributes }}>
+            <div class="product-grid">
+              {% assign tab_collection = block.settings.collection %}
+              {% if tab_collection != blank and tab_collection.products_count > 0 %}
+                {% for product in tab_collection.products limit: section.settings.limit %}
+                  {% render 'product-card', product: product %}
+                {% endfor %}
+              {% else %}
+                {% comment %} Fallback: show all products {% endcomment %}
+                {% for product in collections.all.products limit: section.settings.limit %}
+                  {% render 'product-card', product: product %}
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {% if section.settings.show_view_all %}
+              <div style="text-align: center; margin-top: var(--space-8);">
+                {% if tab_collection != blank %}
+                  <a href="{{ tab_collection.url }}" class="btn btn-outline btn-lg">View All {{ tab_collection.title }}</a>
+                {% else %}
+                  <a href="{{ routes.all_products_collection_url }}" class="btn btn-outline btn-lg">View All Products</a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% comment %} No blocks — show all products directly {% endcomment %}
+      <div class="product-grid reveal reveal-delay-1">
+        {% for product in collections.all.products limit: section.settings.limit %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      </div>
+      {% if section.settings.show_view_all %}
+        <div style="text-align: center; margin-top: var(--space-8);">
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn-outline btn-lg">View All Products</a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-target');
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) targetContent.classList.add('active');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Trending Now",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Curated"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Trending Now"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 12,
+      "step": 4,
+      "label": "Products to show per tab",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All button",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_tab",
+      "name": "Collection Tab",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Tab Name",
+          "default": "All"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection (leave blank to show all products)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trending Now"
+    }
+  ]
+}
+{% endschema %}

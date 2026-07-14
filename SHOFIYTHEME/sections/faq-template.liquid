@@ -1,0 +1,144 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">{{ page.title }}</h1>
+    <div class="page-hero__subtitle">{{ section.settings.subtitle }}</div>
+  </div>
+</div>
+
+<div class="section-gap container container--narrow">
+  <div class="faq-grid">
+    <div class="faq-nav-wrapper hide-on-mobile">
+      <div class="faq-nav">
+        {% assign current_cat = "" %}
+        {% for block in section.blocks %}
+          {% if block.settings.category != current_cat %}
+            <a href="#cat-{{ block.settings.category | handle }}" class="faq-nav-link {% if forloop.first %}active{% endif %}">
+              {{ block.settings.category }}
+            </a>
+            {% assign current_cat = block.settings.category %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    
+    <div class="faq-content">
+      {% assign current_cat = "" %}
+      {% for block in section.blocks %}
+        {% if block.settings.category != current_cat %}
+          {% if not forloop.first %}</div>{% endif %} <!-- Close previous category div -->
+          
+          <div id="cat-{{ block.settings.category | handle }}" class="faq-category" style="margin-bottom: var(--space-12); scroll-margin-top: calc(var(--header-h) + var(--space-8));">
+            <h2 style="font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-6); padding-bottom: var(--space-3); border-bottom: 2px solid var(--clr-black);">{{ block.settings.category }}</h2>
+          {% assign current_cat = block.settings.category %}
+        {% endif %}
+
+        <div class="accordion-item" {{ block.shopify_attributes }}>
+          <div class="accordion-header">
+            {{ block.settings.question }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+        </div>
+        
+        {% if forloop.last %}</div>{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Accordion toggles
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.closest('.accordion-item');
+        
+        // Optional: Close others in same category
+        // const siblings = item.closest('.faq-category').querySelectorAll('.accordion-item');
+        // siblings.forEach(sib => { if(sib !== item) sib.classList.remove('open') });
+        
+        item.classList.toggle('open');
+      });
+    });
+
+    // Smooth scroll for nav links and active state update
+    const navLinks = document.querySelectorAll('.faq-nav-link');
+    const categories = document.querySelectorAll('.faq-category');
+    
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const target = document.getElementById(targetId);
+        if (target) {
+          window.scrollTo({
+            top: target.offsetTop - 100,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Update active nav link on scroll
+    window.addEventListener('scroll', () => {
+      let current = '';
+      categories.forEach(cat => {
+        const catTop = cat.offsetTop;
+        if (pageYOffset >= catTop - 150) {
+          current = cat.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Template",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Everything you need to know about our products and services."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category",
+          "label": "Category",
+          "default": "Shipping & Delivery"
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "How long does shipping take?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer free worldwide shipping. Orders are processed within 24-48 hours. Standard delivery typically takes 5-10 business days.</p>"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

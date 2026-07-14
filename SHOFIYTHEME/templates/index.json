@@ -1,0 +1,34 @@
+{
+  "sections": {
+    "main-hero": {
+      "type": "hero"
+    },
+    "trust-bar": {
+      "type": "trust-bar"
+    },
+    "featured-collections": {
+      "type": "featured-collections"
+    },
+    "trust-badges": {
+      "type": "trust-badges"
+    },
+    "lifestyle-banner": {
+      "type": "lifestyle-banner"
+    },
+    "why-choose-us": {
+      "type": "why-choose-us"
+    },
+    "newsletter": {
+      "type": "newsletter"
+    }
+  },
+  "order": [
+    "main-hero",
+    "trust-bar",
+    "featured-collections",
+    "trust-badges",
+    "lifestyle-banner",
+    "why-choose-us",
+    "newsletter"
+  ]
+}

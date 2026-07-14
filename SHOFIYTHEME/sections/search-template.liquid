@@ -1,0 +1,60 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">Search Results</h1>
+    <div class="page-hero__subtitle">
+      {% if search.performed %}
+        {{ search.results_count }} results for "{{ search.terms }}"
+      {% else %}
+        Find exactly what you're looking for.
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="section-gap container">
+  <form action="{{ routes.search_url }}" method="get" class="search-page-form" style="max-width: 600px; margin: 0 auto var(--space-12);">
+    <div style="display: flex; gap: var(--space-2);">
+      <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search products..." style="flex: 1; padding: 1rem 1.5rem; border: 2px solid var(--clr-black); border-radius: var(--radius-full); font-size: var(--text-base); outline: none;">
+      <input type="hidden" name="type" value="product">
+      <button type="submit" class="btn btn-primary" style="padding-inline: 2rem;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+  </form>
+
+  {% if search.performed %}
+    {% if search.results_count > 0 %}
+      <div class="product-grid">
+        {% for item in search.results %}
+          {% if item.object_type == 'product' %}
+            {% render 'product-card', product: item %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 4rem 0;">
+        <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--clr-muted-2);">🔍</div>
+        <h3 style="font-size: var(--text-xl); font-weight: 700; margin-bottom: 0.5rem;">No results found</h3>
+        <p style="color: var(--clr-muted);">Try checking your spelling or using different keywords.</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <!-- Popular Categories or Products could go here if no search performed -->
+    <div class="section-header" style="margin-bottom: var(--space-6);">
+      <h3 style="font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 800;">Popular Searches</h3>
+    </div>
+    <div style="display: flex; gap: var(--space-2); justify-content: center; flex-wrap: wrap;">
+      <a href="/search?q=wireless&type=product" class="btn btn-outline">Wireless</a>
+      <a href="/search?q=smart+home&type=product" class="btn btn-outline">Smart Home</a>
+      <a href="/search?q=fitness&type=product" class="btn btn-outline">Fitness</a>
+      <a href="/search?q=travel&type=product" class="btn btn-outline">Travel</a>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Search Template",
+  "settings": []
+}
+{% endschema %}

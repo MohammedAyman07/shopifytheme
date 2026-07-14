@@ -1,0 +1,36 @@
+{
+  "general": {
+    "password_message": "Our new store is opening soon."
+  },
+  "accessibility": {
+    "skip_to_text": "Skip to content"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable",
+      "quantity": {
+        "label": "Quantity",
+        "increase": "Increase quantity",
+        "decrease": "Decrease quantity"
+      },
+      "sale_price": "Sale price",
+      "regular_price": "Regular price"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Your cart",
+      "empty": "Your cart is empty",
+      "continue_shopping": "Continue shopping",
+      "checkout": "Checkout",
+      "subtotal": "Subtotal",
+      "taxes_and_shipping_policy_at_checkout_html": "Taxes and <a href=\"{{ link }}\">shipping</a> calculated at checkout"
+    },
+    "free_shipping": {
+      "progress_html": "You are <strong>{{ amount }}</strong> away from free shipping",
+      "qualified_html": "<strong>Congratulations!</strong> You get free standard shipping."
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">Collections</h1>
+  </div>
+</div>
+<div class="section-gap container">
+  <div class="category-grid__items">
+    {% for collection in collections %}
+      <a href="{{ collection.url }}" class="category-card">
+        {% if collection.image != blank %}
+          {{ collection.image | image_url: width: 600 | image_tag: class: 'category-card__img', loading: 'lazy' }}
+        {% else %}
+          <div class="category-card__img" style="background: var(--clr-muted-2);"></div>
+        {% endif %}
+        <div class="category-card__overlay"></div>
+        <div class="category-card__content">
+          <h3 class="category-card__name">{{ collection.title }}</h3>
+          <div class="category-card__count">{{ collection.all_products_count }} Products</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Collections List",
+  "settings": []
+}
+{% endschema %}

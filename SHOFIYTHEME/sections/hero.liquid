@@ -1,0 +1,198 @@
+<div class="hero">
+  {% if section.settings.image != blank %}
+    {{ section.settings.image | image_url: width: 2800 | image_tag: class: 'hero__bg', preload: true, alt: section.settings.title }}
+  {% else %}
+    <div class="hero__bg" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);"></div>
+  {% endif %}
+  <div class="hero__overlay"></div>
+
+  <div class="hero__content">
+    <div class="hero__text-col">
+      {% if section.settings.eyebrow != blank %}
+        <div class="hero__eyebrow">{{ section.settings.eyebrow }}</div>
+      {% endif %}
+
+      <h1 class="hero__title">
+        {% if section.settings.title_line1 != blank %}{{ section.settings.title_line1 }}<br>{% endif %}
+        {% if section.settings.title_line2 != blank %}<span class="gold-text">{{ section.settings.title_line2 }}</span><br>{% endif %}
+        {% if section.settings.title_line3 != blank %}{{ section.settings.title_line3 }}{% endif %}
+      </h1>
+
+      {% if section.settings.subtitle != blank %}
+        <p class="hero__subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+
+      <div class="hero__actions">
+        {% if section.settings.btn_1_label != blank %}
+          <a href="{{ section.settings.btn_1_link | default: '/collections/all' }}" class="btn btn-gold btn-lg">
+            {{ section.settings.btn_1_label }}
+          </a>
+        {% endif %}
+        {% if section.settings.btn_2_label != blank %}
+          <a href="{{ section.settings.btn_2_link | default: '/collections' }}" class="btn btn-outline-white btn-lg">
+            {{ section.settings.btn_2_label }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <div class="hero__stat-number">{{ section.settings.stat1_number }}<span>{{ section.settings.stat1_suffix }}</span></div>
+          <div class="hero__stat-label">{{ section.settings.stat1_label }}</div>
+        </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <div class="hero__stat-number">{{ section.settings.stat2_number }}<span>{{ section.settings.stat2_suffix }}</span></div>
+          <div class="hero__stat-label">{{ section.settings.stat2_label }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__cards">
+      {% for block in section.blocks %}
+        {% if block.type == 'product_card' %}
+          {% assign p = block.settings.product %}
+          {% if p != blank %}
+            <a href="{{ p.url }}" class="hero-product-card" {{ block.shopify_attributes }}>
+              <div class="hero-product-card__img">
+                {{ p.featured_image | image_url: width: 150 | image_tag: alt: p.title }}
+              </div>
+              <div class="hero-product-card__info">
+                <div class="hero-product-card__name">{{ p.title | truncate: 28 }}</div>
+                <div class="hero-product-card__price">{{ p.price | money }}</div>
+              </div>
+              <div class="hero-product-card__badge">TRENDING</div>
+            </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="hero__scroll-indicator">
+    <div class="hero__scroll-line"></div>
+    SCROLL
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Cinematic Hero",
+  "tag": "section",
+  "class": "section-hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Premium Global Lifestyle"
+    },
+    {
+      "type": "text",
+      "id": "title_line1",
+      "label": "Heading Line 1",
+      "default": "Discover"
+    },
+    {
+      "type": "text",
+      "id": "title_line2",
+      "label": "Heading Line 2 (Gold)",
+      "default": "Trending Products"
+    },
+    {
+      "type": "text",
+      "id": "title_line3",
+      "label": "Heading Line 3",
+      "default": "That Elevate Your Life"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Carefully curated innovative products with secure shopping and worldwide delivery."
+    },
+    {
+      "type": "text",
+      "id": "btn_1_label",
+      "label": "Primary Button Label",
+      "default": "Shop Best Sellers"
+    },
+    {
+      "type": "url",
+      "id": "btn_1_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "btn_2_label",
+      "label": "Secondary Button Label",
+      "default": "Explore Collections"
+    },
+    {
+      "type": "url",
+      "id": "btn_2_link",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "stat1_number",
+      "label": "Stat 1 Number",
+      "default": "10"
+    },
+    {
+      "type": "text",
+      "id": "stat1_suffix",
+      "label": "Stat 1 Suffix",
+      "default": "K+"
+    },
+    {
+      "type": "text",
+      "id": "stat1_label",
+      "label": "Stat 1 Label",
+      "default": "Happy Customers"
+    },
+    {
+      "type": "text",
+      "id": "stat2_number",
+      "label": "Stat 2 Number",
+      "default": "4.9"
+    },
+    {
+      "type": "text",
+      "id": "stat2_suffix",
+      "label": "Stat 2 Suffix",
+      "default": "/5"
+    },
+    {
+      "type": "text",
+      "id": "stat2_label",
+      "label": "Stat 2 Label",
+      "default": "Average Rating"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Floating Product Card",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cinematic Hero"
+    }
+  ]
+}
+{% endschema %}

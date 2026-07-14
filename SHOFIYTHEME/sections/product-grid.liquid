@@ -1,0 +1,86 @@
+<div class="product-grid-section section-gap" style="background: var(--clr-surface);">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">{{ section.settings.eyebrow }}</div>
+      <h2 class="section-title">{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle != blank %}
+        <p class="section-subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+
+    <div class="product-grid reveal reveal-delay-1">
+      {% assign fp_collection = section.settings.collection %}
+      {% if fp_collection != blank and fp_collection.products_count > 0 %}
+        {% for product in fp_collection.products limit: section.settings.limit %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      {% else %}
+        {% comment %} Fallback: pull from all products {% endcomment %}
+        {% for product in collections.all.products limit: section.settings.limit %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="reveal reveal-delay-2" style="text-align: center; margin-top: var(--space-10);">
+      {% if section.settings.show_view_all %}
+        {% if fp_collection != blank %}
+          <a href="{{ fp_collection.url }}" class="btn btn-primary btn-lg">View All Products</a>
+        {% else %}
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn-primary btn-lg">View All Products</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Shop"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Handpicked favourites loved by thousands of customers worldwide."
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection (leave blank to show all products)"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All button",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products Grid"
+    }
+  ]
+}
+{% endschema %}

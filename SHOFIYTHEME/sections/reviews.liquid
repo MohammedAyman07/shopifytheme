@@ -1,0 +1,156 @@
+<div id="reviews" class="reviews-section section-gap">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">{{ section.settings.eyebrow }}</div>
+      <h2 class="section-title">{{ section.settings.title }}</h2>
+    </div>
+
+    <div class="reviews-summary reveal reveal-delay-1">
+      <div class="reviews-avg">
+        <div class="reviews-avg-number">4.9</div>
+        <div class="reviews-avg-stars">
+          {% render 'star-rating', rating: 5 %}
+        </div>
+        <div class="reviews-avg-label">Based on 10,482 reviews</div>
+      </div>
+      
+      <div class="reviews-bars">
+        <div class="review-bar">
+          <div class="review-bar__label">5 Star</div>
+          <div class="review-bar__track"><div class="review-bar__fill" style="width: 88%"></div></div>
+          <div class="review-bar__pct">88%</div>
+        </div>
+        <div class="review-bar">
+          <div class="review-bar__label">4 Star</div>
+          <div class="review-bar__track"><div class="review-bar__fill" style="width: 8%"></div></div>
+          <div class="review-bar__pct">8%</div>
+        </div>
+        <div class="review-bar">
+          <div class="review-bar__label">3 Star</div>
+          <div class="review-bar__track"><div class="review-bar__fill" style="width: 3%"></div></div>
+          <div class="review-bar__pct">3%</div>
+        </div>
+        <div class="review-bar">
+          <div class="review-bar__label">2 Star</div>
+          <div class="review-bar__track"><div class="review-bar__fill" style="width: 1%"></div></div>
+          <div class="review-bar__pct">1%</div>
+        </div>
+        <div class="review-bar">
+          <div class="review-bar__label">1 Star</div>
+          <div class="review-bar__track"><div class="review-bar__fill" style="width: 0%"></div></div>
+          <div class="review-bar__pct">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-grid">
+      {% for block in section.blocks %}
+        <div class="review-card reveal reveal-delay-{{ forloop.index | modulo: 3 }}" {{ block.shopify_attributes }}>
+          <div class="review-card__header">
+            <div class="review-card__user">
+              <div class="review-card__avatar">
+                {{ block.settings.author | slice: 0 }}
+              </div>
+              <div>
+                <div class="review-card__name">{{ block.settings.author }}</div>
+                <div class="review-card__meta">
+                  <span class="review-card__country">{{ block.settings.country_flag }}</span>
+                  <span class="review-card__verified">✓ Verified Buyer</span>
+                  <span class="review-card__date">· {{ block.settings.date }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="review-card__stars">
+              {% render 'star-rating', rating: 5 %}
+            </div>
+          </div>
+          
+          <h4 class="review-card__title">{{ block.settings.review_title }}</h4>
+          <p class="review-card__body">{{ block.settings.text }}</p>
+          
+          {% if block.settings.image != blank %}
+            <div class="review-card__images">
+              {{ block.settings.image | image_url: width: 150 | image_tag: class: 'review-card__img', loading: 'lazy' }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Customer Reviews",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Testimonials"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Loved By Thousands"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name",
+          "default": "Michael R."
+        },
+        {
+          "type": "text",
+          "id": "country_flag",
+          "label": "Country Flag Emoji",
+          "default": "🇺🇸"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date",
+          "default": "2 days ago"
+        },
+        {
+          "type": "text",
+          "id": "review_title",
+          "label": "Review Title",
+          "default": "Absolutely perfect."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Review Text",
+          "default": "The quality is outstanding and it arrived so fast. Completely transformed my daily routine. Highly recommend this brand to anyone."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Customer Image (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Reviews Grid",
+      "blocks": [
+        { "type": "review", "settings": { "country_flag": "🇺🇸" } },
+        { "type": "review", "settings": { "country_flag": "🇬🇧" } },
+        { "type": "review", "settings": { "country_flag": "🇨🇦" } },
+        { "type": "review", "settings": { "country_flag": "🇦🇺" } },
+        { "type": "review", "settings": { "country_flag": "🇩🇪" } },
+        { "type": "review", "settings": { "country_flag": "🇫🇷" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

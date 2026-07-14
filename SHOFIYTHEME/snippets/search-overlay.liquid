@@ -1,0 +1,25 @@
+<div class="search-overlay">
+  <div class="search-overlay__inner">
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-overlay__form">
+      <input type="hidden" name="type" value="product">
+      <div class="search-overlay__input-wrapper">
+        <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search products, brands..." class="search-overlay__input" autocomplete="off" autofocus>
+        <button type="submit" aria-label="Submit search" style="color: var(--clr-black);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button type="button" class="search-overlay__close" aria-label="Close search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </form>
+    
+    <div class="search-overlay__results">
+      <div class="search-overlay__suggested">
+        <h4 class="search-trending-title">Popular Searches</h4>
+        <div class="search-trending-tags">
+          <a href="/collections/all?sort_by=created-descending" class="search-tag">New Arrivals</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

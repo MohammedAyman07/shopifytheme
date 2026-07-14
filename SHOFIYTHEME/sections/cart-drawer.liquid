@@ -1,0 +1,144 @@
+<div class="cart-overlay"></div>
+
+<div class="cart-drawer">
+  <div class="cart-drawer__header">
+    <div class="cart-drawer__title">Your Cart</div>
+    <div class="cart-drawer__count">
+      {% if cart.item_count > 0 %}{{ cart.item_count }} items{% endif %}
+    </div>
+    <button class="cart-drawer__close" aria-label="Close cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+
+  {% if cart.item_count > 0 %}
+    {% if settings.cart_show_free_shipping %}
+      <div class="cart-shipping-progress">
+        {% assign threshold = settings.cart_free_shipping_threshold | times: 100 %}
+        {% assign current = cart.total_price %}
+        {% if current >= threshold %}
+          <div class="cart-shipping-text">You've unlocked <strong>Free Standard Shipping</strong>!</div>
+          <div class="cart-progress-track"><div class="cart-progress-fill" style="width: 100%;"></div></div>
+        {% else %}
+          {% assign amount_left = threshold | minus: current | money %}
+          <div class="cart-shipping-text">You're only <strong>{{ amount_left }}</strong> away from free shipping.</div>
+          {% assign percent = current | times: 100 | divided_by: threshold %}
+          <div class="cart-progress-track"><div class="cart-progress-fill" style="width: {{ percent }}%;"></div></div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="cart-drawer__items">
+      {% for item in cart.items %}
+        <div class="cart-item">
+          <a href="{{ item.url }}" class="cart-item__img-wrapper">
+            {{ item.image | image_url: width: 200 | image_tag: class: 'cart-item__img', alt: item.title }}
+          </a>
+          <div class="cart-item__info">
+            <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+            {% unless item.product.has_only_default_variant %}
+              <div class="cart-item__variant">{{ item.variant.title }}</div>
+            {% endunless %}
+            
+            <div class="cart-item__price-row">
+              <div class="cart-item__price">{{ item.final_line_price | money }}</div>
+              
+              <div class="cart-item__qty qty-selector">
+                <button type="button" class="cart-item__qty-btn qty-minus" onclick="updateCartItem({{ forloop.index }}, {{ item.quantity | minus: 1 }})">−</button>
+                <div class="cart-item__qty-num">{{ item.quantity }}</div>
+                <button type="button" class="cart-item__qty-btn qty-plus" onclick="updateCartItem({{ forloop.index }}, {{ item.quantity | plus: 1 }})">+</button>
+              </div>
+            </div>
+          </div>
+          <button class="cart-item__remove" aria-label="Remove item" onclick="updateCartItem({{ forloop.index }}, 0)">×</button>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if settings.cart_upsell_collection != blank %}
+      {% assign upsell_col = collections[settings.cart_upsell_collection] %}
+      {% if upsell_col.products_count > 0 %}
+        <div class="cart-upsell">
+          <div class="cart-upsell__title">Frequently Bought Together</div>
+          <div class="cart-upsell-items">
+            {% for product in upsell_col.products limit: 4 %}
+              <!-- Quick check to see if it's already in cart -->
+              {% assign in_cart = false %}
+              {% for item in cart.items %}
+                {% if item.product.id == product.id %}{% assign in_cart = true %}{% endif %}
+              {% endfor %}
+              
+              {% unless in_cart %}
+                <form action="/cart/add" method="post" class="cart-upsell-item">
+                  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  
+                  {{ product.featured_image | image_url: width: 100 | image_tag: class: 'cart-upsell-item__img' }}
+                  <div>
+                    <div class="cart-upsell-item__name">{{ product.title | truncate: 25 }}</div>
+                    <div class="cart-upsell-item__price">{{ product.price | money }}</div>
+                    <button type="submit" class="cart-upsell-item__add">+ Add</button>
+                  </div>
+                </form>
+              {% endunless %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <div class="cart-drawer__footer">
+      <div class="cart-subtotal">
+        <span class="cart-subtotal__label">Subtotal</span>
+        <span class="cart-subtotal__amount">{{ cart.total_price | money }}</span>
+      </div>
+      <div class="cart-subtotal__tax">Taxes and shipping calculated at checkout</div>
+      
+      <form action="/cart" method="post" novalidate style="margin-top: var(--space-4);">
+        <button type="submit" name="checkout" class="cart-checkout-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+          Checkout
+        </button>
+      </form>
+      
+      <a href="/cart" class="cart-view-link">View Cart</a>
+      
+      <div class="cart-trust">
+        <div class="cart-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Secure Checkout</div>
+      </div>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 4rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+      <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--clr-muted-2);">🛒</div>
+      <h3 style="font-size: var(--text-xl); font-weight: 700; margin-bottom: 0.5rem;">Your Cart is Empty</h3>
+      <p style="color: var(--clr-muted); margin-bottom: 2rem;">Looks like you haven't added anything yet.</p>
+      <a href="/collections/all" class="btn btn-primary btn-lg" onclick="window.toggleCart(false);">Start Shopping</a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  function updateCartItem(line, quantity) {
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        line: line,
+        quantity: quantity
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Re-render cart drawer
+      if (typeof updateCartDrawer === 'function') {
+        updateCartDrawer();
+      } else {
+        window.location.reload();
+      }
+    })
+    .catch(err => console.error(err));
+  }
+</script>

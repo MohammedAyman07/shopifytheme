@@ -1,0 +1,27 @@
+<div class="page-hero">
+  <div class="container">
+    <h1 class="page-hero__title">{{ blog.title }}</h1>
+  </div>
+</div>
+<div class="section-gap container">
+  <div class="grid-3">
+    {% for article in blog.articles %}
+      <a href="{{ article.url }}" class="blog-card" style="display: block; text-decoration: none; color: inherit;">
+        {% if article.image %}
+          <div style="aspect-ratio: 16/9; margin-bottom: 1rem; overflow: hidden; border-radius: var(--radius-lg);">
+            {{ article.image | image_url: width: 600 | image_tag: style: 'width: 100%; height: 100%; object-fit: cover;' }}
+          </div>
+        {% endif %}
+        <div style="font-size: var(--text-sm); color: var(--clr-muted); margin-bottom: 0.5rem;">{{ article.published_at | time_tag: format: 'date' }}</div>
+        <h3 style="font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; margin-bottom: 0.5rem;">{{ article.title }}</h3>
+        <p style="color: var(--clr-muted);">{{ article.excerpt_or_content | strip_html | truncatewords: 20 }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Blog",
+  "settings": []
+}
+{% endschema %}
